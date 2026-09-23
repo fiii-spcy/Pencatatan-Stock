@@ -1,0 +1,6 @@
+{
+  "name": "TokoSembako & Telur - Sistem Stok Multi-Role",
+  "description": "Aplikasi manajemen stok harian real-time, stok masuk/keluar, rekapitulasi harian, riwayat transaksi ber-audit pegawai, dan laporan untuk toko sembako dan agen telur.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

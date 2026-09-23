@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "Kategori produk sembako dan telur",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "name": { "type": "string", "maxLength": 100 },
+        "icon": { "type": "string", "maxLength": 50 },
+        "isCustom": { "type": "boolean" }
+      },
+      "required": ["id", "name"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Item produk toko sembako",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "categoryId": { "type": "string", "maxLength": 100 },
+        "name": { "type": "string", "maxLength": 200 },
+        "unit": { "type": "string", "maxLength": 50 },
+        "minStock": { "type": "number" },
+        "buyPrice": { "type": "number" },
+        "sellPrice": { "type": "number" },
+        "initialStock": { "type": "number" },
+        "supplierDefault": { "type": "string", "maxLength": 200 },
+        "isCustom": { "type": "boolean" }
+      },
+      "required": ["id", "categoryId", "name", "unit", "buyPrice", "sellPrice", "initialStock"]
+    },
+    "StockTransaction": {
+      "title": "StockTransaction",
+      "description": "Transaksi mutasi stok masuk dan keluar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "productId": { "type": "string", "maxLength": 100 },
+        "type": { "type": "string", "enum": ["in", "out_sale", "out_damaged"] },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string", "maxLength": 50 },
+        "date": { "type": "string", "maxLength": 10 },
+        "time": { "type": "string", "maxLength": 10 },
+        "timestamp": { "type": "string", "maxLength": 50 },
+        "userId": { "type": "string", "maxLength": 100 },
+        "userName": { "type": "string", "maxLength": 100 },
+        "userRole": { "type": "string", "maxLength": 50 },
+        "buyPrice": { "type": "number" },
+        "sellPrice": { "type": "number" },
+        "supplier": { "type": "string", "maxLength": 200 },
+        "reason": { "type": "string", "maxLength": 200 },
+        "note": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["id", "productId", "type", "quantity", "unit", "date", "timestamp"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Daftar nama supplier toko",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "name": { "type": "string", "maxLength": 200 }
+      },
+      "required": ["id", "name"]
+    }
+  },
+  "firestore": {
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Koleksi data master kategori"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Koleksi data master produk toko"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "StockTransaction",
+      "description": "Koleksi pencatatan mutasi stok barang masuk & keluar"
+    },
+    "/suppliers/{supplierId}": {
+      "schema": "Supplier",
+      "description": "Koleksi daftar supplier terdaftar"
+    }
+  }
+}

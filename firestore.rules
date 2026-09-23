@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Categories
+    match /categories/{categoryId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin() && isValidId(categoryId) &&
+        incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100;
+      allow delete: if isAdmin();
+    }
+
+    // Products
+    match /products/{productId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin() && isValidId(productId) &&
+        incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 200 &&
+        incoming().buyPrice is number && incoming().buyPrice >= 0 &&
+        incoming().sellPrice is number && incoming().sellPrice >= 0;
+      allow delete: if isAdmin();
+    }
+
+    // Stock Transactions
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated();
+      // Any authenticated user can create transactions
+      allow create: if isAuthenticated() && isValidId(transactionId) &&
+        incoming().productId is string &&
+        incoming().quantity is number && incoming().quantity > 0 &&
+        incoming().type in ['in', 'out_sale', 'out_damaged'];
+      // Only admin can update or delete history
+      allow update: if isAdmin() && isValidId(transactionId) &&
+        incoming().quantity is number && incoming().quantity > 0;
+      allow delete: if isAdmin();
+    }
+
+    // Suppliers
+    match /suppliers/{supplierId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isValidId(supplierId) &&
+        incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 200;
+      allow delete: if isAdmin();
+    }
+
+    // Users
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      // Admin can create/update anyone. User can only update themselves (but cannot elevate role).
+      allow create: if isAdmin() && isValidId(userId) &&
+        incoming().name is string && incoming().name.size() > 0 &&
+        incoming().role in ['admin', 'pegawai'];
+      allow update: if isValidId(userId) && (isAdmin() || (isOwner(userId) && incoming().role == resource.data.role)) &&
+        incoming().name is string && incoming().name.size() > 0;
+      allow delete: if isAdmin() && isValidId(userId);
+    }
+  }
+}

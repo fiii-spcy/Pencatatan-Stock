@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2b3d52" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="eggGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+  </defs>
+  <!-- App Icon Background -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGrad)" />
+  
+  <!-- Store Basket / Cart & Goods -->
+  <g transform="translate(64, 64) scale(0.75)">
+    <!-- Eggs Group -->
+    <ellipse cx="210" cy="180" rx="45" ry="60" fill="url(#eggGrad)" transform="rotate(-15 210 180)" />
+    <ellipse cx="300" cy="180" rx="45" ry="60" fill="url(#eggGrad)" transform="rotate(15 300 180)" />
+    <ellipse cx="256" cy="160" rx="48" ry="65" fill="#fef08a" />
+    
+    <!-- Store Roof / Awning -->
+    <path d="M60,190 L452,190 L480,240 L32,240 Z" fill="#ffffff" opacity="0.9" />
+    <path d="M96,190 L128,240 L160,190 L192,240 L224,190 L256,240 L288,190 L320,240 L352,190 L384,240 L416,190" stroke="#8c5835" stroke-width="8" stroke-linecap="round" />
+
+    <!-- Basket Base -->
+    <path d="M80,250 L432,250 L392,430 C390,445 375,456 360,456 L152,456 C137,456 122,445 120,430 Z" fill="#8c5835" />
+    <path d="M110,270 L402,270 L370,420 L142,420 Z" fill="#6b3f20" opacity="0.4" />
+    
+    <!-- Checkmark Badge -->
+    <circle cx="390" cy="390" r="60" fill="#f59e0b" />
+    <path d="M365,390 L382,408 L418,370" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+</svg>

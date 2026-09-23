@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Buku Panduan – Toko SS Telur & Sembako</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fff;
+      padding: 48px 56px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* COVER */
+    .cover {
+      text-align: center;
+      padding: 60px 0 40px;
+      border-bottom: 3px solid #7E9F85;
+      margin-bottom: 40px;
+    }
+    .cover .icon { font-size: 56px; margin-bottom: 16px; }
+    .cover h1 { font-size: 26px; font-weight: 800; color: #1a1a1a; line-height: 1.3; }
+    .cover h2 { font-size: 15px; font-weight: 600; color: #7E9F85; margin-top: 8px; }
+    .cover p { font-size: 12px; color: #888; margin-top: 12px; }
+
+    /* SECTION */
+    .section { margin-bottom: 36px; }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #1a1a1a;
+      background: #f3f7f4;
+      border-left: 4px solid #7E9F85;
+      padding: 10px 16px;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 16px;
+    }
+    .section-title .num {
+      background: #7E9F85;
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* SUBSECTION */
+    .subsection { margin: 16px 0; }
+    .subsection h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2a2a2a;
+      margin-bottom: 8px;
+    }
+
+    /* STEPS */
+    ol { padding-left: 0; list-style: none; counter-reset: step; }
+    ol li {
+      counter-increment: step;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 8px;
+      align-items: flex-start;
+    }
+    ol li::before {
+      content: counter(step);
+      background: #7E9F85;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    ul { padding-left: 18px; }
+    ul li { margin-bottom: 6px; }
+
+    /* HIGHLIGHT BOX */
+    .highlight {
+      background: #f3f7f4;
+      border: 1px solid #c8deca;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+    }
+    .highlight strong { color: #4a7f55; }
+
+    /* WARNING BOX */
+    .warning {
+      background: #fff8f0;
+      border: 1px solid #f5c89a;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 12px;
+      color: #8a4a00;
+    }
+
+    /* INFO BOX */
+    .info {
+      background: #f0f6ff;
+      border: 1px solid #b0ccf5;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 12px;
+      color: #1a4080;
+    }
+
+    strong { font-weight: 700; }
+    code {
+      background: #f0f0f0;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    /* DIVIDER */
+    hr { border: none; border-top: 1px solid #e8e8e8; margin: 28px 0; }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid #e8e8e8;
+      font-size: 11px;
+      color: #aaa;
+    }
+
+    @media print {
+      body { padding: 32px 40px; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="icon">🥚</div>
+    <h1>Buku Panduan Penggunaan<br>Aplikasi Toko SS Telur & Sembako</h1>
+    <h2>Sistem Kasir & Manajemen Stok Harian</h2>
+    <p>Dokumen ini berisi panduan lengkap cara menggunakan aplikasi dari awal hingga operasional harian.</p>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="num">1</div>
+      📱 Cara Akses & Instalasi di HP
+    </div>
+
+    <p>Aplikasi ini <strong>tidak perlu di-download dari Play Store</strong>. Anda bisa menginstalnya langsung dari browser HP agar lebih ringan dan cepat.</p>
+
+    <div class="info">🔗 Link Aplikasi: <strong>https://toko-telor.vercel.app</strong></div>
+
+    <div class="subsection">
+      <h4>Langkah Instalasi di Android (Google Chrome):</h4>
+      <ol>
+        <li>Buka aplikasi <strong>Google Chrome</strong> di HP Android Anda.</li>
+        <li>Ketik atau kunjungi link: <code>https://toko-telor.vercel.app</code></li>
+        <li>Login menggunakan Email dan Password yang telah diberikan.</li>
+        <li>Setelah masuk, klik ikon <strong>Menu (≡)</strong> di pojok kanan bawah layar.</li>
+        <li>Gulir ke bawah dan klik tombol <strong>"Instal Aplikasi"</strong>.</li>
+        <li>Akan muncul konfirmasi — pilih <strong>Instal / Tambahkan ke Layar Utama</strong>.</li>
+        <li>✅ Selesai! Ikon aplikasi kini sudah ada di layar utama HP Anda.</li>
+      </ol>
+    </div>
+
+    <div class="warning">⚠️ Selanjutnya, selalu buka aplikasi dari <strong>layar utama HP</strong> (ikon yang sudah terinstal), bukan dari browser. Ini memastikan tampilan penuh tanpa toolbar browser.</div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="num">2</div>
+      🔑 Cara Login & Sistem PIN
+    </div>
+
+    <p>Aplikasi dilengkapi sistem keamanan dua lapisan untuk melindungi data toko.</p>
+
+    <div class="subsection">
+      <ol>
+        <li><strong>Email & Password:</strong> Digunakan saat pertama kali login atau setelah logout penuh.</li>
+        <li><strong>PIN 4 Angka:</strong> Setelah login berhasil, Anda diminta membuat PIN rahasia. Ke depannya, PIN ini yang akan digunakan setiap kali membuka aplikasi — lebih cepat dan aman.</li>
+      </ol>
+    </div>
+
+    <div class="highlight">
+      💡 <strong>Tips:</strong> Selama Anda tidak menekan tombol <strong>Logout (Keluar Akun)</strong>, Anda hanya perlu memasukkan PIN 4 angka setiap kali membuka aplikasi. Tidak perlu ketik email & password lagi.
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="num">3</div>
+      🛠 Langkah Pertama: Membuat Kategori & Produk
+    </div>
+
+    <p>Sebelum bisa mencatat barang masuk atau keluar, Anda <strong>wajib mendaftarkan barang dagangan</strong> terlebih dahulu.</p>
+
+    <div class="subsection">
+      <h4>A. Membuat Kategori (Kelompok Barang)</h4>
+      <ol>
+        <li>Masuk ke menu <strong>Lainnya (≡)</strong> di pojok kanan bawah.</li>
+        <li>Pilih <strong>Atur Kategori</strong>.</li>
+        <li>Klik tombol <strong>+</strong> atau <strong>Tambah Kategori</strong>.</li>
+        <li>Masukkan nama kategori (contoh: <em>"Telur"</em>, <em>"Beras"</em>, <em>"Minyak"</em>) dan pilih ikon yang sesuai.</li>
+        <li>Klik <strong>Simpan</strong>.</li>
+      </ol>
+    </div>
+
+    <div class="subsection">
+      <h4>B. Membuat Data Produk (Barang Spesifik)</h4>
+      <ol>
+        <li>Masuk ke menu <strong>Lainnya (≡)</strong>.</li>
+        <li>Pilih <strong>Atur Produk</strong>.</li>
+        <li>Klik tombol <strong>Tambah Produk</strong>.</li>
+        <li>Isi data produk:
+          <ul>
+            <li>Pilih <strong>Kategori</strong> (misal: Telur)</li>
+            <li><strong>Nama Produk</strong> (misal: Telur Ayam Negeri 1 Kg)</li>
+            <li><strong>Satuan</strong> (misal: Kg, Liter, Ikat, Pcs)</li>
+            <li><strong>Harga Beli</strong> & <strong>Harga Jual</strong></li>
+            <li><strong>Stok Minimal</strong> — peringatan merah muncul jika stok di bawah angka ini</li>
+          </ul>
+        </li>
+        <li>Klik <strong>Simpan</strong>.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="num">4</div>
+      📦 Mencatat Barang Masuk (Kulakan/Restock)
+    </div>
+
+    <p>Setiap ada barang baru datang dari supplier, segera catat agar stok bertambah dan tercatat rapi.</p>
+
+    <ol>
+      <li>Klik tab <strong>Masuk</strong> (ikon panah ke bawah ↓) di bagian bawah layar.</li>
+      <li>Pilih <strong>produk</strong> yang baru datang dari daftar.</li>
+      <li>Masukkan <strong>jumlah</strong> barang yang masuk.</li>
+      <li>Sesuaikan <strong>Harga Beli</strong> jika harga agen sedang naik/turun hari itu.</li>
+      <li>(Opsional) Pilih nama <strong>Supplier</strong> dan tambahkan catatan/keterangan jika perlu.</li>
+      <li>Klik <strong>Simpan Stok Masuk</strong>. Stok akan otomatis bertambah. ✅</li>
+    </ol>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="num">5</div>
+      🛒 Mencatat Penjualan (Barang Keluar)
+    </div>
+
+    <p>Saat ada pembeli, catat transaksinya agar stok berkurang otomatis dan pendapatan tercatat.</p>
+
+    <ol>
+      <li>Klik tab <strong>Keluar</strong> (ikon panah ke atas ↑) di bagian bawah layar.</li>
+      <li>Pastikan tipe transaksi dipilih <strong>"Penjualan / Stok Keluar"</strong>.</li>
+      <li>Pilih <strong>produk</strong> yang terjual.</li>
+      <li>Masukkan <strong>jumlah</strong> yang dibeli pelanggan.</li>
+      <li>Sesuaikan <strong>Harga Jual</strong> jika memberikan diskon ke pelanggan tertentu.</li>
+      <li>Klik <strong>Catat Penjualan</strong>. Stok akan otomatis berkurang. ✅</li>
+    </ol>
+
+    <div class="warning">⚠️ Pilih <strong>"Barang Rusak / Kadaluarsa"</strong> HANYA jika barang pecah, busuk, atau dibuang — bukan untuk penjualan normal.</div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="num">6</div>
+      📊 Melihat Laporan & Riwayat Transaksi
+    </div>
+
+    <p>Aplikasi merekap semua data secara otomatis — tidak perlu hitung manual lagi!</p>
+
+    <div class="subsection">
+      <h4>Dashboard (Beranda)</h4>
+      <p>Halaman utama langsung menampilkan ringkasan hari ini:</p>
+      <ul>
+        <li>Total barang masuk hari ini</li>
+        <li>Total uang penjualan hari ini</li>
+        <li>Estimasi keuntungan</li>
+        <li>Daftar barang yang stoknya hampir habis (peringatan merah)</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h4>Cara Membatalkan / Menghapus Transaksi yang Salah</h4>
+      <ol>
+        <li>Masuk ke menu <strong>Lainnya (≡)</strong> → pilih <strong>Laporan & Riwayat</strong>.</li>
+        <li>Cari transaksi yang salah dari daftar.</li>
+        <li>Tekan ikon <strong>🗑 Hapus (Tong Sampah)</strong> di sebelah kanan transaksi tersebut.</li>
+        <li>Stok barang akan otomatis dikembalikan seperti semula. ✅</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="num">7</div>
+      👥 Mengatur Akun Pegawai / Kasir
+    </div>
+
+    <p>Jika Anda memiliki karyawan, Anda bisa membuatkan akun khusus untuk mereka.</p>
+
+    <ol>
+      <li>Masuk ke menu <strong>Lainnya (≡)</strong> → pilih <strong>Atur Pegawai</strong>.</li>
+      <li>Isi form dengan nama, email, password, dan PIN kasir.</li>
+      <li>Di bagian <strong>Hak Akses</strong>, pilih sesuai kebutuhan:
+        <ul>
+          <li><strong>Kasir / Pegawai</strong> — Bisa mencatat barang masuk & penjualan, tapi tidak bisa hapus data atau lihat laporan keuangan lengkap.</li>
+          <li><strong>Admin / Pemilik</strong> — Akses penuh ke seluruh fitur aplikasi.</li>
+        </ul>
+      </li>
+      <li>Klik <strong>Daftarkan</strong>. Akun langsung aktif dan bisa digunakan. ✅</li>
+    </ol>
+
+    <div class="highlight">
+      💡 <strong>Rekomendasi:</strong> Berikan akses <strong>Kasir / Pegawai</strong> untuk karyawan sehari-hari, dan simpan akun <strong>Admin</strong> hanya untuk pemilik toko.
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>📱 Toko SS Telur & Sembako — Sistem Kasir & Manajemen Stok Harian</p>
+    <p style="margin-top: 4px;">Link Aplikasi: https://toko-telor.vercel.app</p>
+  </div>
+
+</body>
+</html>
