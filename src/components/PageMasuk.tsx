@@ -25,8 +25,25 @@ export const PageMasuk: React.FC = () => {
     products.find((p) => p.categoryId === categories[0]?.id)?.id || products[0]?.id || ''
   );
 
-  const [quantity, setQuantity] = useState<number | ''>('');
-  const [price, setPrice] = useState<number | ''>('');
+  const [quantity, setQuantity] = useState<string>('');
+  const [price, setPrice] = useState<string>('');
+
+  // Helper: parse desimal — support koma (157,5) dan titik (157.5)
+  const parseDecimal = (val: string): number => {
+    const normalized = val.replace(',', '.');
+    const parsed = parseFloat(normalized);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  // Validasi input: izinkan kosong, angka, satu koma atau titik
+  const handleDecimalInput = (
+    val: string,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    if (val === '' || /^[\d]*[,.]?[\d]*$/.test(val)) {
+      setter(val);
+    }
+  };
   const [supplier, setSupplier] = useState<string>('');
   const [note, setNote] = useState<string>('');
 
@@ -52,12 +69,12 @@ export const PageMasuk: React.FC = () => {
     setSelectedProductId(productId);
     const prod = products.find((p) => p.id === productId);
     if (prod) {
-      setPrice(prod.buyPrice);
+      setPrice(prod.buyPrice > 0 ? String(prod.buyPrice) : '');
       setSupplier(prod.supplierDefault || '');
     }
   };
-const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 0;
-  const currentBuyPrice = price !== '' ? Number(price) : (currentProduct?.buyPrice || 0);
+  const qtyNumber = parseDecimal(quantity);
+  const currentBuyPrice = price !== '' ? parseDecimal(price) : (currentProduct?.buyPrice || 0);
   const calculatedTotalBelanja = qtyNumber * currentBuyPrice;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -68,7 +85,7 @@ const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 
       return;
     }
 
-    const qty = Number(quantity);
+    const qty = parseDecimal(quantity);
     if (!qty || qty <= 0) {
       showToast('Jumlah masuk harus lebih besar dari 0', 'warning');
       return;
@@ -77,7 +94,7 @@ const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 
     const res = addStockIn({
       productId: selectedProductId,
       quantity: qty,
-      buyPrice: price !== '' ? Number(price) : undefined,
+      buyPrice: price !== '' ? parseDecimal(price) : undefined,
       supplier: supplier.trim() || undefined,
       note: note.trim() || undefined
 });
@@ -100,7 +117,7 @@ const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 
       const itemDaily = dailyStockList.find((d) => d.productId === p.id);
       const todayInSaved = itemDaily?.stockIn ?? 0;
       const inputQty = (p.id === selectedProductId && qtyNumber > 0) ? qtyNumber : 0;
-      const pBuyPrice = (p.id === selectedProductId && price !== '') ? Number(price) : p.buyPrice;
+      const pBuyPrice = (p.id === selectedProductId && price !== '') ? parseDecimal(price) : p.buyPrice;
       return acc + ((todayInSaved + inputQty) * pBuyPrice);
     }, 0);
   }, [filteredProducts, dailyStockList, selectedProductId, qtyNumber, price]);
@@ -224,13 +241,14 @@ const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 
               </label>
               <div className="flex gap-2">
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   min="0.1"
                   step="any"
                   required
-                  placeholder="0"
+                  placeholder="Contoh: 157,5"
                   value={quantity}
-                  onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))}
+                  onChange={(e) => handleDecimalInput(e.target.value, setQuantity)}
                   className="flex-1 bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 h-14 text-xl font-bold text-black focus:outline-none focus:ring-2 focus:ring-[#7E9F85] focus:bg-white"
                 />
                 <div className="w-16 rounded-xl bg-neutral-100 flex items-center justify-center font-bold text-neutral-600 text-sm">
@@ -245,11 +263,11 @@ const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 
                 Harga beli modal / {currentProduct?.unit || 'satuan'} (Rp)
               </label>
               <input
-                type="number"
-                min="0"
+                type="text"
+                inputMode="decimal"
                 placeholder="Contoh: 28000"
                 value={price}
-                onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                onChange={(e) => handleDecimalInput(e.target.value, setPrice)}
                 className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 h-12 text-sm font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#7E9F85] focus:bg-white"
               />
             </div>
@@ -373,13 +391,12 @@ const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 
                 </label>
                 <div className="flex gap-2">
                   <input
-                    type="number"
-                    min="0.1"
-                    step="any"
+                    type="text"
+                    inputMode="decimal"
                     required
-                    placeholder="Contoh: 50"
+                    placeholder="Contoh: 157,5"
                     value={quantity}
-                    onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))}
+                    onChange={(e) => handleDecimalInput(e.target.value, setQuantity)}
                     className="flex-1 bg-[#FAFAFA] border border-neutral-200 rounded-2xl px-4 h-12 text-base font-bold text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85] focus:bg-white"
                   />
                   <div className="w-16 rounded-2xl bg-neutral-100 flex items-center justify-center font-bold text-neutral-600 text-xs">
@@ -394,11 +411,11 @@ const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 
                     Harga beli modal per {currentProduct?.unit || 'satuan'} (Rp)
                   </label>
                   <input
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="Contoh: 28000"
                     value={price}
-                    onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                    onChange={(e) => handleDecimalInput(e.target.value, setPrice)}
                     className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-2xl px-4 py-2.5 text-xs font-semibold text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85] focus:bg-white"
                   />
                 </div>
@@ -485,7 +502,7 @@ const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 
                       const inputQty = isSelected && qtyNumber > 0 ? qtyNumber : 0;
                       const totalInDisplay = todayInSaved + inputQty;
                       const estimasiStok = currentStock + inputQty;
-                      const pBuyPrice = (isSelected && price !== '') ? Number(price) : prod.buyPrice;
+                      const pBuyPrice = (isSelected && price !== '') ? parseDecimal(price) : prod.buyPrice;
                       const pembelianTotal = totalInDisplay * pBuyPrice;
 
                       return (

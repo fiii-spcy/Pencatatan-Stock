@@ -30,7 +30,24 @@ export const PageKeluar: React.FC = () => {
   );
 
   const [outType, setOutType] = useState<'out_sale' | 'out_damaged'>('out_sale');
-  const [quantity, setQuantity] = useState<number | ''>('');
+  const [quantity, setQuantity] = useState<string>('');
+
+  // Helper: parse desimal — support koma (157,5) dan titik (157.5)
+  const parseDecimal = (val: string): number => {
+    const normalized = val.replace(',', '.');
+    const parsed = parseFloat(normalized);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  // Validasi input: izinkan kosong, angka, satu koma atau titik
+  const handleDecimalInput = (
+    val: string,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    if (val === '' || /^[\d]*[,.]?[\d]*$/.test(val)) {
+      setter(val);
+    }
+  };
   const [damagedReason, setDamagedReason] = useState<string>('Pecah saat sortasi/pengiriman');
   const [note, setNote] = useState<string>('');
 
@@ -53,7 +70,7 @@ export const PageKeluar: React.FC = () => {
   }, [dailyStockList, selectedProductId]);
 
   const fixedSellPrice = currentProduct?.sellPrice || 0;
-  const qtyNumber = typeof quantity === 'number' && !isNaN(quantity) ? quantity : 0;
+  const qtyNumber = parseDecimal(quantity);
   const calculatedPengeluaran = qtyNumber * fixedSellPrice;
 
   const handleSelectProduct = (productId: string) => {
@@ -63,7 +80,7 @@ export const PageKeluar: React.FC = () => {
   const handleSwitchType = (type: 'out_sale' | 'out_damaged') => {
     setOutType(type);
   };
-const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedProductId || !currentProduct) {
@@ -71,7 +88,7 @@ const handleSubmit = (e: React.FormEvent) => {
       return;
     }
 
-    const qty = Number(quantity);
+    const qty = parseDecimal(quantity);
     if (!qty || qty <= 0) {
       showToast('Jumlah pengeluaran harus lebih besar dari 0', 'warning');
       return;
@@ -302,15 +319,12 @@ const handleSubmit = (e: React.FormEvent) => {
               </label>
               <div className="flex gap-2">
                 <input
-                  type="number"
-                  min="0.1"
-                  step="any"
+                  type="text"
+                  inputMode="decimal"
                   required
-                  placeholder="0"
+                  placeholder="Contoh: 157,5"
                   value={quantity}
-                  onChange={(e) =>
-                    setQuantity(e.target.value === '' ? '' : Number(e.target.value))
-                  }
+                  onChange={(e) => handleDecimalInput(e.target.value, setQuantity)}
                   className="flex-1 bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 h-14 text-xl font-bold text-black focus:outline-none focus:ring-2 focus:ring-[#7E9F85] focus:bg-white"
                 />
                 <div className="w-16 rounded-xl bg-neutral-100 flex items-center justify-center font-bold text-neutral-600 text-sm">
@@ -502,15 +516,12 @@ const handleSubmit = (e: React.FormEvent) => {
                 </label>
                 <div className="flex gap-2">
                   <input
-                    type="number"
-                    min="0.1"
-                    step="any"
+                    type="text"
+                    inputMode="decimal"
                     required
-                    placeholder="Masukkan jumlah barang..."
+                    placeholder="Contoh: 157,5"
                     value={quantity}
-                    onChange={(e) =>
-                      setQuantity(e.target.value === '' ? '' : Number(e.target.value))
-                    }
+                    onChange={(e) => handleDecimalInput(e.target.value, setQuantity)}
                     className="flex-1 bg-[#FAFAFA] border border-neutral-200 rounded-2xl px-4 h-12 text-base font-bold text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85] focus:bg-white"
                   />
                   <div className="w-20 rounded-2xl bg-neutral-100 flex items-center justify-center font-bold text-neutral-600 text-xs">

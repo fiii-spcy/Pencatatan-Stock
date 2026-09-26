@@ -214,6 +214,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Categories
     unsubs.push(onSnapshot(collection(db, 'categories'), (snapshot) => {
+      if (snapshot.empty) return; // Pertahankan data lokal jika Firestore kosong
       const remoteCategories: Category[] = [];
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
@@ -224,6 +225,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Products
     unsubs.push(onSnapshot(collection(db, 'products'), (snapshot) => {
+      // Hanya timpa data lokal jika Firestore benar-benar punya data.
+      // Jika snapshot kosong (0 doc), kemungkinan offline atau belum ada data → pertahankan state lokal.
+      if (snapshot.empty) return;
       const remoteProducts: Product[] = [];
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
@@ -411,7 +415,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!isAdmin) return;
     const category: Category = { ...categoryData, id: `cat-${Date.now()}`, isCustom: true };
     setCategories((prev) => [...prev, category]);
-    setDoc(doc(db, 'categories', category.id), category).catch(console.warn);
+    setDoc(doc(db, 'categories', category.id), cleanForFirestore(category as any))
+      .catch((err) => console.error('[Firestore] Gagal simpan kategori:', err?.code, err?.message));
   };
 
   const updateCategory = (id: string, updates: Partial<Category>) => {
@@ -427,25 +432,44 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     deleteDoc(doc(db, 'categories', id)).catch(console.warn);
   };
 
+  // Helper: hapus semua field undefined sebelum dikirim ke Firestore.
+  // Firestore menolak dokumen dengan nilai undefined → menyebabkan silent fail → data tidak tersimpan setelah refresh.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cleanForFirestore = (obj: Record<string, any>): Record<string, any> => {
+    const cleaned: Record<string, any> = {};
+    for (const key of Object.keys(obj)) {
+      if (obj[key] !== undefined) {
+        cleaned[key] = obj[key];
+      }
+    }
+    return cleaned;
+  };
+
   // Product Management
   const addProduct = (prodData: Omit<Product, 'id'>) => {
     if (!isAdmin) return;
     const product: Product = { ...prodData, id: `prod-${Date.now()}`, isCustom: true };
     setProducts((prev) => [...prev, product]);
-    setDoc(doc(db, 'products', product.id), product).catch(console.warn);
+    setDoc(doc(db, 'products', product.id), cleanForFirestore(product as any))
+      .catch((err) => console.error('[Firestore] Gagal menyimpan produk:', err?.code, err?.message));
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
     if (!isAdmin) return;
     setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
     const target = products.find((p) => p.id === id);
-    if (target) setDoc(doc(db, 'products', id), { ...target, ...updates }, { merge: true }).catch(console.warn);
+    if (target) {
+      const merged = cleanForFirestore({ ...target, ...updates } as any);
+      setDoc(doc(db, 'products', id), merged, { merge: true })
+        .catch((err) => console.error('[Firestore] Gagal update produk:', err?.code, err?.message));
+    }
   };
 
   const deleteProduct = (id: string) => {
     if (!isAdmin) return;
     setProducts((prev) => prev.filter((p) => p.id !== id));
-    deleteDoc(doc(db, 'products', id)).catch(console.warn);
+    deleteDoc(doc(db, 'products', id))
+      .catch((err) => console.error('[Firestore] Gagal hapus produk:', err?.code, err?.message));
   };
 
   // selectedDate MUST be declared before dailyStockList useMemo that references it
@@ -555,7 +579,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setTransactions((prev) => [newTx, ...prev]);
-    setDoc(doc(db, 'transactions', newTx.id), newTx).catch(console.warn);
+    setDoc(doc(db, 'transactions', newTx.id), cleanForFirestore(newTx as any))
+      .catch((err) => console.error('[Firestore] Gagal simpan transaksi masuk:', err?.code, err?.message));
     return { success: true };
   };
 
@@ -586,7 +611,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setTransactions((prev) => [newTx, ...prev]);
-    setDoc(doc(db, 'transactions', newTx.id), newTx).catch(console.warn);
+    setDoc(doc(db, 'transactions', newTx.id), cleanForFirestore(newTx as any))
+      .catch((err) => console.error('[Firestore] Gagal simpan transaksi keluar:', err?.code, err?.message));
     return { success: true };
   };
 
