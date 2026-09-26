@@ -24,13 +24,17 @@ export interface Product {
   id: string;
   categoryId: string;
   name: string;
-  unit: string; // kg, butir, pouch, karung, pcs, dus, botol, pack, peti
+  unit: string; // satuan utama: kg, butir, pouch, karung, pcs, dus, botol, pack, peti
   minStock: number; // batas notifikasi stok menipis
   buyPrice: number; // harga beli / modal HPP
-  sellPrice: number; // harga jual
+  sellPrice: number; // harga jual per satuan utama
   initialStock: number; // stok pembuka sistem
   supplierDefault?: string;
   isCustom?: boolean;
+  // Multi-satuan jual (opsional) — memungkinkan satu produk dijual dalam 2 satuan berbeda
+  altUnit?: string;           // Nama satuan alternatif, contoh: "butir"
+  altSellPrice?: number;      // Harga jual per satuan alternatif, contoh: 2000
+  altUnitConversion?: number; // Berapa satuan alt = 1 satuan utama, contoh: 16 (16 butir = 1 kg)
 }
 
 export type TransactionType = 'in' | 'out_sale' | 'out_damaged';

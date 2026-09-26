@@ -236,6 +236,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           minStock: Number(data.minStock) || 0, buyPrice: Number(data.buyPrice) || 0,
           sellPrice: Number(data.sellPrice) || 0, initialStock: Number(data.initialStock) || 0,
           supplierDefault: data.supplierDefault, isCustom: data.isCustom,
+          altUnit: data.altUnit,
+          altSellPrice: data.altSellPrice !== undefined ? Number(data.altSellPrice) : undefined,
+          altUnitConversion: data.altUnitConversion !== undefined ? Number(data.altUnitConversion) : undefined,
         });
       });
       setProducts(remoteProducts);

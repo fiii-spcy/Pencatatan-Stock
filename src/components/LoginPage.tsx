@@ -455,20 +455,6 @@ export const LoginPage: React.FC = () => {
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
-
-                {/* PIN Reminder Helper */}
-                <div className="mt-4 pt-3 border-t border-neutral-100 text-center">
-                  <p className="text-[11px] text-neutral-500">
-                    PIN Bawaan Admin:{" "}
-                    <code className="bg-amber-100 px-1 py-0.2 rounded font-mono font-bold">
-                      1234
-                    </code>{" "}
-                    | Kasir Budi:{" "}
-                    <code className="bg-amber-100 px-1 py-0.2 rounded font-mono font-bold">
-                      1111
-                    </code>
-                  </p>
-                </div>
               </motion.div>
             )}
           </AnimatePresence>

@@ -69,7 +69,22 @@ export const PageKeluar: React.FC = () => {
     return dailyStockList.find((d) => d.productId === selectedProductId);
   }, [dailyStockList, selectedProductId]);
 
-  const fixedSellPrice = currentProduct?.sellPrice || 0;
+  const [useAltUnit, setUseAltUnit] = useState<boolean>(false);
+
+  // Reset pilihan satuan saat produk diganti
+  React.useEffect(() => {
+    setUseAltUnit(false);
+    setQuantity('');
+  }, [selectedProductId]);
+
+  const hasAltUnit = Boolean(
+    currentProduct?.altUnit && currentProduct?.altSellPrice && currentProduct?.altUnitConversion
+  );
+
+  const fixedSellPrice = useAltUnit && hasAltUnit
+    ? currentProduct!.altSellPrice!
+    : currentProduct?.sellPrice || 0;
+
   const qtyNumber = parseDecimal(quantity);
   const calculatedPengeluaran = qtyNumber * fixedSellPrice;
 
@@ -94,21 +109,34 @@ export const PageKeluar: React.FC = () => {
       return;
     }
 
+    let qtyInMainUnit = qty;
+    let sellPriceInMainUnit = fixedSellPrice;
+    let autoNote = note.trim();
+    let displayUnit = currentProduct.unit;
+
+    if (useAltUnit && hasAltUnit && currentProduct.altUnitConversion) {
+      qtyInMainUnit = qty / currentProduct.altUnitConversion;
+      // Konversi ekuivalen harga per satuan utama
+      sellPriceInMainUnit = currentProduct.altSellPrice! * currentProduct.altUnitConversion;
+      autoNote = `[Jual ${qty} ${currentProduct.altUnit}] ${autoNote}`.trim();
+      displayUnit = currentProduct.altUnit!;
+    }
+
     const res = addStockOut({
       productId: selectedProductId,
-      quantity: qty,
+      quantity: qtyInMainUnit,
       type: outType,
-      sellPrice: outType === 'out_sale' ? fixedSellPrice : 0,
+      sellPrice: outType === 'out_sale' ? sellPriceInMainUnit : 0,
       reason:
         outType === 'out_sale'
           ? 'Penjualan Kasir'
           : damagedReason.trim() || 'Barang Rusak / Pecah',
-      note: note.trim() || undefined,
+      note: autoNote || undefined,
     });
 
     if (res.success) {
       showToast(
-        `✅ ${qty} ${currentProduct.unit} ${currentProduct.name} berhasil dicatat (${
+        `✅ ${qty} ${displayUnit} ${currentProduct.name} berhasil dicatat (${
           outType === 'out_sale' ? formatRupiah(calculatedPengeluaran) : 'Afkir'
         })`,
         'success'
@@ -312,10 +340,37 @@ export const PageKeluar: React.FC = () => {
               </div>
             )}
 
+            {/* Unit Toggle (Mobile) */}
+            {hasAltUnit && (
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-black mb-2">Satuan penjualan</label>
+                <div className="flex bg-neutral-100/70 p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setUseAltUnit(false)}
+                    className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-colors ${
+                      !useAltUnit ? 'bg-white shadow-sm text-black' : 'text-neutral-500'
+                    }`}
+                  >
+                    {currentProduct?.unit}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUseAltUnit(true)}
+                    className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-colors ${
+                      useAltUnit ? 'bg-white shadow-sm text-black' : 'text-neutral-500'
+                    }`}
+                  >
+                    {currentProduct?.altUnit}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Jumlah Keluar */}
             <div>
               <label className="block text-sm font-bold text-black mb-2">
-                Jumlah keluar ({currentProduct?.unit || 'satuan'})
+                Jumlah keluar ({useAltUnit ? currentProduct?.altUnit : (currentProduct?.unit || 'satuan')})
               </label>
               <div className="flex gap-2">
                 <input
@@ -328,11 +383,14 @@ export const PageKeluar: React.FC = () => {
                   className="flex-1 bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 h-14 text-xl font-bold text-black focus:outline-none focus:ring-2 focus:ring-[#7E9F85] focus:bg-white"
                 />
                 <div className="w-16 rounded-xl bg-neutral-100 flex items-center justify-center font-bold text-neutral-600 text-sm">
-                  {currentProduct?.unit || 'pcs'}
+                  {useAltUnit ? currentProduct?.altUnit : (currentProduct?.unit || 'pcs')}
                 </div>
               </div>
               {/* Over-stock warning */}
-              {currentDailyStock && qtyNumber > currentDailyStock.finalStock && (
+              {currentDailyStock &&
+                (useAltUnit && currentProduct?.altUnitConversion
+                  ? qtyNumber / currentProduct.altUnitConversion
+                  : qtyNumber) > currentDailyStock.finalStock && (
                 <p className="text-xs text-rose-600 font-semibold mt-1.5">
                   ⚠ Melebihi stok ({currentDailyStock.finalStock} {currentProduct?.unit})
                 </p>
@@ -510,9 +568,36 @@ export const PageKeluar: React.FC = () => {
           <div className="bg-white rounded-2xl p-8 border border-neutral-100">
             <h3 className="text-base font-bold text-black mb-4">Rincian pengeluaran</h3>
             <form onSubmit={handleSubmit} className="space-y-5 text-xs">
+              {/* Unit Toggle (Desktop) */}
+              {hasAltUnit && (
+                <div>
+                  <label className="block text-xs font-bold text-black mb-1.5">Satuan penjualan</label>
+                  <div className="flex bg-neutral-100/70 p-1 rounded-2xl">
+                    <button
+                      type="button"
+                      onClick={() => setUseAltUnit(false)}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-colors ${
+                        !useAltUnit ? 'bg-white shadow-sm text-black' : 'text-neutral-500'
+                      }`}
+                    >
+                      {currentProduct?.unit}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUseAltUnit(true)}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-colors ${
+                        useAltUnit ? 'bg-white shadow-sm text-black' : 'text-neutral-500'
+                      }`}
+                    >
+                      {currentProduct?.altUnit}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-bold text-black mb-1.5">
-                  Jumlah barang keluar ({currentProduct?.unit || 'satuan'})
+                  Jumlah barang keluar ({useAltUnit ? currentProduct?.altUnit : (currentProduct?.unit || 'satuan')})
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -525,9 +610,18 @@ export const PageKeluar: React.FC = () => {
                     className="flex-1 bg-[#FAFAFA] border border-neutral-200 rounded-2xl px-4 h-12 text-base font-bold text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85] focus:bg-white"
                   />
                   <div className="w-20 rounded-2xl bg-neutral-100 flex items-center justify-center font-bold text-neutral-600 text-xs">
-                    {currentProduct?.unit || 'pcs'}
+                    {useAltUnit ? currentProduct?.altUnit : (currentProduct?.unit || 'pcs')}
                   </div>
                 </div>
+                {/* Over-stock warning */}
+                {currentDailyStock &&
+                  (useAltUnit && currentProduct?.altUnitConversion
+                    ? qtyNumber / currentProduct.altUnitConversion
+                    : qtyNumber) > currentDailyStock.finalStock && (
+                  <p className="text-xs text-rose-600 font-semibold mt-1.5">
+                    ⚠ Melebihi stok ({currentDailyStock.finalStock} {currentProduct?.unit})
+                  </p>
+                )}
               </div>
 
               {outType === 'out_sale' ? (

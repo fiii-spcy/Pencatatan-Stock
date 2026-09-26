@@ -51,6 +51,10 @@ export const ProductManagementModal: React.FC<ProductManagementModalProps> = ({
   const [newProdSellPrice, setNewProdSellPrice] = useState<string>('');
   const [newProdInitialStock, setNewProdInitialStock] = useState<string>('');
   const [newProdSupplier, setNewProdSupplier] = useState('');
+  // Multi-satuan jual tambahan
+  const [newProdAltUnit, setNewProdAltUnit] = useState<string>('');
+  const [newProdAltSellPrice, setNewProdAltSellPrice] = useState<string>('');
+  const [newProdAltConversion, setNewProdAltConversion] = useState<string>('');
 
   // Category Form & Edit State
   const [newCatName, setNewCatName] = useState('');
@@ -65,6 +69,10 @@ export const ProductManagementModal: React.FC<ProductManagementModalProps> = ({
   const [editSellPrice, setEditSellPrice] = useState<string>('');
   const [editInitialStock, setEditInitialStock] = useState<string>('');
   const [editSupplier, setEditSupplier] = useState<string>('');
+  // Multi-satuan jual tambahan (edit)
+  const [editAltUnit, setEditAltUnit] = useState<string>('');
+  const [editAltSellPrice, setEditAltSellPrice] = useState<string>('');
+  const [editAltConversion, setEditAltConversion] = useState<string>('');
 
   const { showToast } = useToast();
 
@@ -85,13 +93,19 @@ export const ProductManagementModal: React.FC<ProductManagementModalProps> = ({
       buyPrice: parseDecimal(newProdBuyPrice),
       sellPrice: parseDecimal(newProdSellPrice),
       initialStock: parseDecimal(newProdInitialStock),
-      supplierDefault: newProdSupplier.trim() || undefined
+      supplierDefault: newProdSupplier.trim() || undefined,
+      altUnit: newProdAltUnit.trim() || undefined,
+      altSellPrice: newProdAltUnit.trim() ? parseDecimal(newProdAltSellPrice) : undefined,
+      altUnitConversion: newProdAltUnit.trim() ? parseDecimal(newProdAltConversion) : undefined,
 });
 
     setNewProdName('');
     setNewProdBuyPrice('');
     setNewProdSellPrice('');
     setNewProdInitialStock('');
+    setNewProdAltUnit('');
+    setNewProdAltSellPrice('');
+    setNewProdAltConversion('');
     showToast('Produk berhasil didaftarkan dengan stok awal toko.', 'success');
   };
 
@@ -134,7 +148,10 @@ export const ProductManagementModal: React.FC<ProductManagementModalProps> = ({
       sellPrice: parseDecimal(editSellPrice),
       minStock: 0,
       initialStock: parseDecimal(editInitialStock),
-      supplierDefault: editSupplier.trim() || undefined
+      supplierDefault: editSupplier.trim() || undefined,
+      altUnit: editAltUnit.trim() || undefined,
+      altSellPrice: editAltUnit.trim() ? parseDecimal(editAltSellPrice) : undefined,
+      altUnitConversion: editAltUnit.trim() ? parseDecimal(editAltConversion) : undefined,
 });
 
     setEditingProd(null);
@@ -150,6 +167,9 @@ export const ProductManagementModal: React.FC<ProductManagementModalProps> = ({
     setEditSellPrice(String(p.sellPrice));
     setEditInitialStock(String(p.initialStock));
     setEditSupplier(p.supplierDefault || '');
+    setEditAltUnit(p.altUnit || '');
+    setEditAltSellPrice(p.altSellPrice !== undefined ? String(p.altSellPrice) : '');
+    setEditAltConversion(p.altUnitConversion !== undefined ? String(p.altUnitConversion) : '');
   };
 
   // Validasi input: hanya izinkan angka, koma, dan titik
@@ -333,6 +353,52 @@ export const ProductManagementModal: React.FC<ProductManagementModalProps> = ({
                     </p>
                   </div>
 
+                  {/* ===== SATUAN JUAL TAMBAHAN ===== */}
+                  <div className="sm:col-span-2 bg-[#FAFAFA] border border-neutral-200 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-bold text-neutral-700">Satuan jual tambahan</span>
+                      <span className="text-[10px] bg-neutral-200 text-neutral-500 px-2 py-0.5 rounded-full">Opsional</span>
+                    </div>
+                    <p className="text-[11px] text-neutral-400 mb-3">
+                      Jika produk bisa dijual dalam 2 satuan (contoh: per <strong>kg</strong> dan per <strong>butir</strong>), isi bagian ini. Kosongkan jika tidak perlu.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      <div>
+                        <label className="block text-[11px] text-neutral-500 mb-1">Nama satuan alt.</label>
+                        <input
+                          type="text"
+                          placeholder="Contoh: butir"
+                          value={newProdAltUnit}
+                          onChange={(e) => setNewProdAltUnit(e.target.value)}
+                          className="w-full bg-white border border-neutral-200 rounded-xl px-3 py-2 text-xs text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-neutral-500 mb-1">Harga jual / satuan alt. (Rp)</label>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="Contoh: 2000"
+                          value={newProdAltSellPrice}
+                          onChange={(e) => handleDecimalInput(e, setNewProdAltSellPrice)}
+                          className="w-full bg-white border border-neutral-200 rounded-xl px-3 py-2 text-xs text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-neutral-500 mb-1">Konversi (X satuan alt = 1 utama)</label>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="Contoh: 16"
+                          value={newProdAltConversion}
+                          onChange={(e) => handleDecimalInput(e, setNewProdAltConversion)}
+                          className="w-full bg-white border border-neutral-200 rounded-xl px-3 py-2 text-xs text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85]"
+                        />
+                        <p className="text-[10px] text-neutral-400 mt-1">Misal: 16 butir = 1 kg</p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="col-span-1 sm:col-span-2 text-right pt-2">
                     <button
                       type="submit"
@@ -508,6 +574,49 @@ export const ProductManagementModal: React.FC<ProductManagementModalProps> = ({
                                 />
                               </div>
                             </div>
+
+                            {/* ===== SATUAN JUAL TAMBAHAN (EDIT) ===== */}
+                            <div className="mt-3 bg-white border border-neutral-200 rounded-2xl p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs font-bold text-neutral-700">Satuan jual tambahan</span>
+                                <span className="text-[10px] bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded-full">Opsional</span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <div>
+                                  <label className="block text-[10px] text-neutral-500 mb-1">Satuan alt.</label>
+                                  <input
+                                    type="text"
+                                    placeholder="Contoh: butir"
+                                    value={editAltUnit}
+                                    onChange={(e) => setEditAltUnit(e.target.value)}
+                                    className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-3 py-2 text-xs text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85]"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] text-neutral-500 mb-1">Harga (Rp)</label>
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    placeholder="Contoh: 2000"
+                                    value={editAltSellPrice}
+                                    onChange={(e) => handleDecimalInput(e, setEditAltSellPrice)}
+                                    className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-3 py-2 text-xs text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85]"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] text-neutral-500 mb-1">Konversi (X alt = 1 utama)</label>
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    placeholder="Contoh: 16"
+                                    value={editAltConversion}
+                                    onChange={(e) => handleDecimalInput(e, setEditAltConversion)}
+                                    className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-3 py-2 text-xs text-black focus:outline-none focus:ring-1 focus:ring-[#7E9F85]"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
                             <div className="flex gap-2 justify-end mt-4">
                               <button
                                 type="button"
