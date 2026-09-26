@@ -412,7 +412,7 @@ export const PageKeluar: React.FC = () => {
                 <div className="text-lg font-bold text-black">
                   {formatRupiah(fixedSellPrice)}
                   <span className="text-xs font-normal text-neutral-400 ml-1">
-                    / {currentProduct?.unit || 'satuan'}
+                    / {useAltUnit ? currentProduct?.altUnit : (currentProduct?.unit || 'satuan')}
                   </span>
                 </div>
               </div>
@@ -639,7 +639,7 @@ export const PageKeluar: React.FC = () => {
                     <div className="text-lg font-bold text-black">
                       {formatRupiah(fixedSellPrice)}{' '}
                       <span className="text-xs font-normal text-neutral-400">
-                        / {currentProduct?.unit || 'satuan'}
+                        / {useAltUnit ? currentProduct?.altUnit : (currentProduct?.unit || 'satuan')}
                       </span>
                     </div>
                     <span className="text-[11px] text-neutral-400">Ubah di menu Kelola Barang</span>
