@@ -290,7 +290,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Handle alias specifically for backwards compatibility with demo
     let targetEmail = clean;
-    if (clean === 'admin' || clean === 'pemilik') targetEmail = 'sstelursembako@gmail.com';
+    if (clean === 'admin' || clean === 'pemilik') targetEmail = 'admin@toko.com';
     else if (clean === 'budi') targetEmail = 'budi@toko.com';
     else if (clean === 'siti') targetEmail = 'siti@toko.com';
 
