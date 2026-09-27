@@ -80,8 +80,8 @@ export const ReportsView: React.FC = () => {
               stockIn += tx.quantity;
             } else if (tx.type === 'out_sale') {
               stockOutSale += tx.quantity;
-              const sellP = tx.sellPrice ?? p.sellPrice;
-              const buyP = tx.buyPrice ?? p.buyPrice;
+              const isAltSale = tx.note?.includes('[Jual '); const currentAltEquivalent = (p.altSellPrice && p.altUnitConversion) ? (p.altSellPrice * p.altUnitConversion) : null; const sellP = (isAltSale && currentAltEquivalent) ? currentAltEquivalent : p.sellPrice;
+              const buyP = p.buyPrice;
               revenue += tx.quantity * sellP;
               cost += tx.quantity * buyP;
             } else if (tx.type === 'out_damaged') {
