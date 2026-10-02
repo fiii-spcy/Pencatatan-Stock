@@ -18,6 +18,9 @@ export const PageKeluar: React.FC = () => {
     addStockOut,
     currentUser,
     transactions,
+    isAdmin,
+    updateTransaction,
+    deleteTransaction
   } = useApp();
   const { showToast } = useToast();
 
@@ -70,6 +73,45 @@ export const PageKeluar: React.FC = () => {
   }, [dailyStockList, selectedProductId]);
 
   const [useAltUnit, setUseAltUnit] = useState<boolean>(false);
+
+  // Edit History State
+  const [editingTx, setEditingTx] = useState<any>(null);
+  const [editQuantity, setEditQuantity] = useState('');
+  const [editOutType, setEditOutType] = useState<'out_sale' | 'out_damaged'>('out_sale');
+  const [editPrice, setEditPrice] = useState('');
+  const [editReason, setEditReason] = useState('');
+  const [editNote, setEditNote] = useState('');
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTx) return;
+    const qtyNum = parseFloat(editQuantity.replace(',', '.'));
+    if (isNaN(qtyNum) || qtyNum <= 0) {
+      showToast('Jumlah tidak valid', 'error');
+      return;
+    }
+    const res = updateTransaction(editingTx.id, {
+      quantity: qtyNum,
+      type: editOutType,
+      sellPrice: parseFloat(editPrice) || 0,
+      reason: editReason.trim() || undefined,
+      note: editNote.trim() || undefined
+    });
+    if (res.success) {
+      showToast('Transaksi berhasil diubah', 'success');
+      setEditingTx(null);
+    } else {
+      showToast(res.message || 'Gagal mengubah', 'error');
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Yakin ingin menghapus riwayat ini?')) {
+      const res = deleteTransaction(id);
+      if (res.success) showToast('Transaksi dihapus', 'success');
+      else showToast(res.message || 'Gagal menghapus', 'error');
+    }
+  };
 
   // Reset pilihan satuan saat produk diganti
   React.useEffect(() => {
@@ -828,6 +870,7 @@ export const PageKeluar: React.FC = () => {
                 <th className="py-2.5 px-3 font-semibold w-2/5">Barang</th>
                 <th className="py-2.5 px-3 text-right font-semibold w-1/5">Jumlah</th>
                 <th className="py-2.5 px-4 text-right font-semibold w-1/5 text-[#3E6047]">Sisa</th>
+                {isAdmin && <th className="py-2.5 px-4 text-center font-semibold w-1/5">Aksi</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-50">
@@ -863,6 +906,33 @@ export const PageKeluar: React.FC = () => {
                           {tx.currentBalance} {tx.unit}
                         </span>
                       </td>
+                      {isAdmin && (
+                        <td className="py-3 px-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => {
+                                setEditingTx(tx);
+                                setEditQuantity(tx.quantity.toString());
+                                setEditOutType(tx.type as any);
+                                setEditPrice((tx.sellPrice || 0).toString());
+                                setEditReason(tx.reason || '');
+                                setEditNote(tx.note || '');
+                              }}
+                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Edit Transaksi"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(tx.id)}
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Hapus Transaksi"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   );
                 })
@@ -877,6 +947,81 @@ export const PageKeluar: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editingTx && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl">
+            <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
+              <h3 className="font-bold text-lg text-black">Edit Transaksi Keluar</h3>
+              <button onClick={() => setEditingTx(null)} className="p-2 hover:bg-neutral-100 rounded-full">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleEditSubmit} className="p-4 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-neutral-500 mb-1">Tipe Keluar</label>
+                <select
+                  value={editOutType}
+                  onChange={(e) => setEditOutType(e.target.value as any)}
+                  className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#7E9F85]/20 focus:border-[#7E9F85] outline-none"
+                >
+                  <option value="out_sale">Terjual</option>
+                  <option value="out_damaged">Barang Rusak/Pecah</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-neutral-500 mb-1">Jumlah</label>
+                <input
+                  type="number"
+                  step="any"
+                  value={editQuantity}
+                  onChange={(e) => setEditQuantity(e.target.value)}
+                  className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#7E9F85]/20 focus:border-[#7E9F85] outline-none"
+                  required
+                />
+              </div>
+              {editOutType === 'out_sale' && (
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-500 mb-1">Harga Jual</label>
+                  <input
+                    type="number"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(e.target.value)}
+                    className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#7E9F85]/20 focus:border-[#7E9F85] outline-none"
+                  />
+                </div>
+              )}
+              {editOutType === 'out_damaged' && (
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-500 mb-1">Alasan Rusak</label>
+                  <input
+                    type="text"
+                    value={editReason}
+                    onChange={(e) => setEditReason(e.target.value)}
+                    className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#7E9F85]/20 focus:border-[#7E9F85] outline-none"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-semibold text-neutral-500 mb-1">Catatan</label>
+                <input
+                  type="text"
+                  value={editNote}
+                  onChange={(e) => setEditNote(e.target.value)}
+                  className="w-full bg-[#FAFAFA] border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#7E9F85]/20 focus:border-[#7E9F85] outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-[#7E9F85] text-white font-bold py-3 rounded-xl mt-2 hover:bg-[#6F8F75]"
+              >
+                Simpan Perubahan
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
