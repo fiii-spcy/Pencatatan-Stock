@@ -6,6 +6,9 @@ import {
   PackageMinus,
   ShoppingCart,
   AlertOctagon,
+  Pencil,
+  Trash2,
+  X
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from './Toast';
